@@ -12,12 +12,24 @@ use Nette\DI;
 class Extension extends DI\CompilerExtension
 {
 
+	const FORMAT_JPEG = 'jpeg';
+	const FORMAT_PNG = 'png';
+	const FORMAT_GIF = 'gif';
+
 	/** @var array */
 	private $defaults = [
 		'routes' => [],
 		'rules' => [],
 		'providers' => [],
 		'wwwDir' => '%wwwDir%',
+		'format' => self::FORMAT_JPEG,
+	];
+
+	/** @var array */
+	public $supportedFormats = [
+		self::FORMAT_JPEG => Generator::FORMAT_JPEG,
+		self::FORMAT_PNG => Generator::FORMAT_PNG,
+		self::FORMAT_GIF => Generator::FORMAT_GIF,
 	];
 
 
@@ -44,15 +56,21 @@ class Extension extends DI\CompilerExtension
 		}
 
 		$i = 0;
-		foreach ($config['routes'] as $route => $defaults) {
-			if (!is_array($defaults)) {
-				$route = $defaults;
+		foreach ($config['routes'] as $route => $definition) {
+			if (!is_array($definition)) {
+				$route = $definition;
+				$format = $config['format'];
 				$defaults = [];
+			} else {
+				$route = $definition['mask'];
+				$format = isset($definition['format']) ? $definition['format'] : $config['format'];
+				$defaults = isset($definition['defaults']) ? $definition['defaults'] : [];
 			}
 
 			$route = $container->addDefinition($this->prefix('route' . $i))
 				->setClass('DotBlue\WebImages\Route', [
 					$route,
+					$format,
 					$defaults,
 					$this->prefix('@generator'),
 				])

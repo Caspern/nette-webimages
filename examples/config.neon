@@ -8,6 +8,8 @@ webimages:
 
 	routes:
 		- 'images/<id>-<width>x<height>.jpg'
+		- mask: 'images/<id>-<width>x<height>.png'
+		  format: png
 
 	rules:
 		- [width: 300, height: 200]

@@ -24,7 +24,7 @@ class Route extends Application\Routers\Route
 	 * @param  array
 	 * @param  Validator
 	 */
-	public function __construct($mask, array $defaults, Generator $generator)
+	public function __construct($mask, $format, array $defaults, Generator $generator)
 	{
 		$this->defaults = array_replace($this->defaults, $defaults);
 
@@ -45,7 +45,7 @@ class Route extends Application\Routers\Route
 		};
 
 		$defaults['presenter'] = 'Nette:Micro';
-		$defaults['callback'] = function ($presenter) use ($generator) {
+		$defaults['callback'] = function ($presenter) use ($format, $generator) {
 			$params = $presenter->getRequest()->getParameters();
 
 			$id = $params['id'];
@@ -54,7 +54,7 @@ class Route extends Application\Routers\Route
 			$height = $this->acquireArgument('height', $params);
 			$algorithm = $this->acquireArgument('algorithm', $params);
 
-			$generator->generateImage($id, $width, $height, $algorithm);
+			$generator->generateImage($format, $id, $width, $height, $algorithm);
 		};
 
 		parent::__construct($mask, $defaults);
